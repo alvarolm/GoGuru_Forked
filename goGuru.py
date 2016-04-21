@@ -71,7 +71,7 @@ class GoGuruCommand(sublime_plugin.TextCommand):
             return
 
         # Get the guru mode from the user.
-        modes = ["callees","callers","callgraph","callstack","describe","freevars","implements","peers","referrers"]
+        modes = ["callees","callers","callstack","definition","describe","freevars","implements","peers","pointsto","referrers","what","callgraph"]
         descriptions  = [
             "callees     show possible targets of selected function call",
             "callers     show possible callers of selected function",
