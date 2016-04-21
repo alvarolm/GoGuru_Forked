@@ -156,17 +156,21 @@ class GoGuruCommand(sublime_plugin.TextCommand):
         merged_env.update(get_setting("env", {}))
         debug("env", merged_env)
 
-        guru_scope = " ".join(get_setting("guru_scope", ""))
+        guru_scope = ",".join(get_setting("guru_scope", ""))
 
         # assumed local package 
         if get_setting("use_current_package", True) :
-            local_package = os.path.realpath(os.path.dirname(file_path)).strip(os.path.realpath(merged_env["GOPATH"]+"src/"))
-            guru_scope = guru_scope+' '+ local_package
+            guru_scope = guru_scope+',.'
+        #    current_file_path = os.path.realpath(os.path.dirname(file_path))
+        #    GOPATH = os.path.realpath(merged_env["GOPATH"]+"/src")+"/"
+        #    local_package = current_file_path.replace(GOPATH, "")
+        #    debug("current_file_path", current_file_path)
+        #    debug("GOPATH", GOPATH)
         debug("guru_scope", guru_scope)
         
 
         # Build guru cmd.
-        cmd = "oracleAS -pos=%(file_path)s:%(pos)s -format=%(output_format)s %(mode)s %(scope)s" % {
+        cmd = "guru -scope %(scope)s -format=%(output_format)s %(mode)s %(file_path)s:%(pos)s" % {
         "file_path": file_path,
         "pos": pos,
         "output_format": get_setting("guru_format"),
