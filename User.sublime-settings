@@ -3,5 +3,6 @@
 	// "env": {},
 	// "guru_scope": ["github.com/juju/juju/cmd/juju", "github.com/juju/juju/cmd/jujud"],
 	// "guru_format": "",
+	"debug": true,
 	"output": "output_panel",
 }

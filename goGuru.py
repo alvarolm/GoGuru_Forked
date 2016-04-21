@@ -8,7 +8,44 @@ It depends on the guru tool being installed:
 go get golang.org/x/tools/cmd/guru
 """
 
-import sublime, sublime_plugin, subprocess, time, re
+import sublime, sublime_plugin, subprocess, time, re, os, subprocess, sys
+
+DEBUG = False
+VERSION = ''
+DEV = True
+
+
+def log(*msg):
+    print("GoGuru:", msg[0:])
+
+def debug(*msg):
+    if DEBUG:
+        print("GoGuru [DEBUG]:", msg[0:])
+
+def plugin_loaded():
+    DEBUG = get_setting("debug", False)
+    log("GoGuru DEBUG:", DEBUG)
+
+    if DEV:
+        try:
+            PluginPath = sublime.packages_path()+'/GoGuru/'
+            p = subprocess.Popen(["git", "describe", "master", "--tags"], stdout=subprocess.PIPE, cwd=PluginPath)
+            GITVERSION = p.communicate()[0].decode("utf-8").rstrip()
+            if p.returncode != 0:
+                 log("invalid git process return code", p.returncode)
+                 raise
+            f = open(PluginPath+'VERSION', 'w')
+            f.write(GITVERSION)
+            f.close()
+        except:
+            log("couldn't get git tag, unexpected error:", sys.exc_info()[0])
+
+    # read version
+    f = open(PluginPath+'VERSION', 'r')
+    VERSION = f.read().rstrip()
+    log("VERSION:", VERSION)
+    f.close()
+
 
 class GoGuruCommand(sublime_plugin.TextCommand):
     def run(self, edit, mode=None):
@@ -109,9 +146,11 @@ class GoGuruCommand(sublime_plugin.TextCommand):
 
         custom_env = get_setting("env")
         merged_env = os.environ.copy()
-        merged_env.copy(custom_env)
+        merged_env.update(custom_env)
+        debug("env", merged_env)
 
-        guru_scope = join(get_setting("guru_scope"))
+        guru_scope = " ".join(get_setting("guru_scope", ""))
+        debug("guru_scope", guru_scope)
 
         # assumed local package 
         if get_setting("use_current_package", True) :
@@ -126,12 +165,12 @@ class GoGuruCommand(sublime_plugin.TextCommand):
         "output_format": get_setting("guru_format"),
         "mode": mode,
         # TODO if scpoe is not set, use main.go under pwd or sublime project path.
-        "scope": ' '.join(get_setting("guru_scope"))} 
+        "scope": guru_scope} 
 
         sublime.set_timeout_async(lambda: self.runInThread(cmd, callback, merged_env), 0)
 
     def runInThread(self, cmd, callback, env):
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, shell=True, env=merged_env)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, shell=True, env=env)
         out, err = proc.communicate()
         callback(out.decode('utf-8'), err.decode('utf-8'))
 
