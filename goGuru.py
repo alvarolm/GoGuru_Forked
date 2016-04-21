@@ -8,7 +8,7 @@ It depends on the guru tool being installed:
 go get golang.org/x/tools/cmd/guru
 """
 
-import sublime, sublime_plugin, subprocess, time, re, os, subprocess, sys
+import sublime, sublime_plugin, subprocess, time, re, os, subprocess, sys, shellenv
 
 DEBUG = False
 VERSION = ''
@@ -23,6 +23,8 @@ def debug(*msg):
         print("GoGuru [DEBUG]:", msg[0:])
 
 def plugin_loaded():
+    global DEBUG
+    global VERSION
     DEBUG = get_setting("debug", False)
     log("GoGuru DEBUG:", DEBUG)
 
@@ -48,7 +50,12 @@ def plugin_loaded():
 
 
 class GoGuruCommand(sublime_plugin.TextCommand):
+    def __init__(self, view):
+        self.view = view 
+        self.thevariable = 'YOUR VALUE'
     def run(self, edit, mode=None):
+
+        DEBUG = get_setting("debug", False)
 
         region = self.view.sel()[0]
         text = self.view.substr(sublime.Region(0, region.end()))
@@ -144,28 +151,28 @@ class GoGuruCommand(sublime_plugin.TextCommand):
         #TODO Check file header for builds.
         file_path = self.view.file_name()
 
-        custom_env = get_setting("env")
-        merged_env = os.environ.copy()
-        merged_env.update(custom_env)
+
+        merged_env = shellenv.get_env(for_subprocess=True)[1]
+        merged_env.update(get_setting("env", {}))
         debug("env", merged_env)
 
         guru_scope = " ".join(get_setting("guru_scope", ""))
-        debug("guru_scope", guru_scope)
 
         # assumed local package 
         if get_setting("use_current_package", True) :
             local_package = os.path.realpath(os.path.dirname(file_path)).strip(os.path.realpath(merged_env["GOPATH"]+"src/"))
-            guru_scope = guru_scope+' '+local_package
+            guru_scope = guru_scope+' '+ local_package
+        debug("guru_scope", guru_scope)
         
 
         # Build guru cmd.
-        cmd = "oracle -pos=%(file_path)s:%(pos)s -format=%(output_format)s %(mode)s %(scope)s" % {
+        cmd = "oracleAS -pos=%(file_path)s:%(pos)s -format=%(output_format)s %(mode)s %(scope)s" % {
         "file_path": file_path,
         "pos": pos,
         "output_format": get_setting("guru_format"),
         "mode": mode,
-        # TODO if scpoe is not set, use main.go under pwd or sublime project path.
         "scope": guru_scope} 
+        debug("cmd", cmd)
 
         sublime.set_timeout_async(lambda: self.runInThread(cmd, callback, merged_env), 0)
 
