@@ -1,7 +1,7 @@
 GoGuru
 =========
 
-GoOracle is a Golang plugin for [SublimeText](http://www.sublimetext.com/) 3 that integrates the Go [guru](https://godoc.org/golang.org/x/tools/cmd/guru) tool.
+GoGuru is a Golang plugin for [SublimeText](http://www.sublimetext.com/) 3 that integrates the Go [guru](https://godoc.org/golang.org/x/tools/cmd/guru) tool.
 
 based on previus work from [waigani](http://github.com/waigani/GoOracle).
 
