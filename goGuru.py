@@ -102,26 +102,25 @@ class GoGuruCommand(sublime_plugin.TextCommand):
         pos = "#" + str(end_offset)
         if begin_offset is not None:
             pos = "#%i,#%i" %(begin_offset, end_offset)
-        env = get_setting("env")
 
         #Set GOOS based on os at the end of the file name.
         #TODO Check file header for builds.
         file_path = self.view.file_name()
-        goos = ""
-        #From https://golang.org/doc/install/source
-        goos_options = ["darwin", "dragonfly", "freebsd", "linux", "netbsd", "openbsd", "plan9", "solaris", "windows"]
-        sp = file_path.rsplit("_", 1)
-        if len(sp) == 2:
-            if sp[1].endswith('.go'):
-                last = sp[1][:-3]
-                if last in goos_options:
-                    goos = last
+
+        custom_env = get_setting("env")
+        merged_env = os.environ.copy()
+        merged_env.copy(custom_env)
+
+        guru_scope = join(get_setting("guru_scope"))
+
+        # assumed local package 
+        if get_setting("use_current_package", True) :
+            local_package = os.path.realpath(os.path.dirname(file_path)).strip(os.path.realpath(merged_env["GOPATH"]+"src/"))
+            guru_scope = guru_scope+' '+local_package
+        
 
         # Build guru cmd.
-        cmd = "export GOPATH=\"%(go_path)s\"; export PATH=%(path)s; GOOS=%(goos)s guru -pos=%(file_path)s:%(pos)s -format=%(output_format)s %(mode)s %(scope)s" % {
-        "go_path": env["GOPATH"],
-        "path": env["PATH"],
-        "goos": goos,
+        cmd = "oracle -pos=%(file_path)s:%(pos)s -format=%(output_format)s %(mode)s %(scope)s" % {
         "file_path": file_path,
         "pos": pos,
         "output_format": get_setting("guru_format"),
@@ -129,14 +128,10 @@ class GoGuruCommand(sublime_plugin.TextCommand):
         # TODO if scpoe is not set, use main.go under pwd or sublime project path.
         "scope": ' '.join(get_setting("guru_scope"))} 
 
-        if "GOROOT" in env:
-            gRoot = "export GOROOT=\"%s\"; " % env["GOROOT"] 
-            cmd = gRoot + cmd
+        sublime.set_timeout_async(lambda: self.runInThread(cmd, callback, merged_env), 0)
 
-        sublime.set_timeout_async(lambda: self.runInThread(cmd, callback), 0)
-
-    def runInThread(self, cmd, callback):
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, shell=True)
+    def runInThread(self, cmd, callback, env):
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, shell=True, env=merged_env)
         out, err = proc.communicate()
         callback(out.decode('utf-8'), err.decode('utf-8'))
 

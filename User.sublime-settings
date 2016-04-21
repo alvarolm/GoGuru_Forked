@@ -1,6 +1,7 @@
 {
 	// Example settings. Replace these with your own.
 	// "env": {},
-	// "oracle_scope": ["github.com/juju/juju/cmd/juju", "github.com/juju/juju/cmd/jujud"],
-	// "oracle_format": "",
+	// "guru_scope": ["github.com/juju/juju/cmd/juju", "github.com/juju/juju/cmd/jujud"],
+	// "guru_format": "",
+	"output": "output_panel",
 }

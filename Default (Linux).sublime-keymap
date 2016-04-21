@@ -1,4 +1,4 @@
 [
-    { "keys": ["ctrl+shift+g"], "command": "go_oracle"},
-    { "keys": ["ctrl+alt+shift+g"], "command": "go_oracle_show_results"}
+    { "keys": ["ctrl+shift+g"], "command": "go_guru"},
+    { "keys": ["ctrl+alt+shift+g"], "command": "go_guru_show_results"}
 ]
