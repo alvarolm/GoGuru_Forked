@@ -75,13 +75,16 @@ class GoGuruCommand(sublime_plugin.TextCommand):
         descriptions  = [
             "callees     show possible targets of selected function call",
             "callers     show possible callers of selected function",
-            "callgraph   show complete callgraph of program",
             "callstack   show path from callgraph root to selected function",
+            "definition  show declaration of selected identifier",
             "describe    describe selected syntax: definition, methods, etc",
             "freevars    show free variables of selection",
-            "implements  show 'implements' relation for selected package",
+            "implements  show 'implements' relation for selected type or method",
             "peers       show send/receive corresponding to selected channel op",
-            "referrers   show all refs to entity denoted by selected identifier"]
+            "pointsto    show variables the selected pointer may point to",
+            "referrers   show all refs to entity denoted by selected identifier",
+            "what        show basic information about the selected syntax node",
+            "callgraph   show complete callgraph of program"]
 
         # Call guru cmd with the given mode.
         def on_done(i):
@@ -166,11 +169,13 @@ class GoGuruCommand(sublime_plugin.TextCommand):
         #    local_package = current_file_path.replace(GOPATH, "")
         #    debug("current_file_path", current_file_path)
         #    debug("GOPATH", GOPATH)
+        guru_scope = guru_scope.strip()
         debug("guru_scope", guru_scope)
-        
+        if len(guru_scope) > 0:
+            guru_scope = "-scope "+guru_scope
 
         # Build guru cmd.
-        cmd = "guru -scope %(scope)s -format=%(output_format)s %(mode)s %(file_path)s:%(pos)s" % {
+        cmd = "guru %(scope)s -format=%(output_format)s %(mode)s %(file_path)s:%(pos)s" % {
         "file_path": file_path,
         "pos": pos,
         "output_format": get_setting("guru_format"),
