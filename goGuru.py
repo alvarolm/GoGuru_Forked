@@ -163,12 +163,13 @@ class GoGuruCommand(sublime_plugin.TextCommand):
 
         # assumed local package 
         if get_setting("use_current_package", True) :
-            guru_scope = guru_scope+',.'
-        #    current_file_path = os.path.realpath(os.path.dirname(file_path))
-        #    GOPATH = os.path.realpath(merged_env["GOPATH"]+"/src")+"/"
-        #    local_package = current_file_path.replace(GOPATH, "")
-        #    debug("current_file_path", current_file_path)
-        #    debug("GOPATH", GOPATH)
+            current_file_path = os.path.realpath(os.path.dirname(file_path))
+            GOPATH = os.path.realpath(merged_env["GOPATH"]+"/src")+"/"
+            local_package = current_file_path.replace(GOPATH, "")
+            debug("current_file_path", current_file_path)
+            debug("GOPATH", GOPATH)
+            debug("local_package", local_package)
+            guru_scope = guru_scope+','+local_package
         guru_scope = guru_scope.strip()
         debug("guru_scope", guru_scope)
         if len(guru_scope) > 0:
