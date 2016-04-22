@@ -1,0 +1,48 @@
+[
+    {
+        "caption": "GoGuru",
+        "command": "go_guru"
+    },
+    {
+        "caption": "GoGuru: Show Results",
+        "command": "go_guru_show_results"
+    },
+    {
+        "caption": "GoGuru: User Settings",
+        "command": "open_file",
+        "args": {
+            "file": "${packages}/GoGuru/User.sublime-settings"
+        }
+    },
+    {
+        "caption": "GoGuru: Default Settings",
+        "command": "open_file",
+        "args": {
+            "file": "${packages}/GoGuru/Default.sublime-settings"
+        }
+    },
+    {
+        "caption": "GoGuru: Default Key Bindings",
+        "command": "open_file",
+        "args": {
+            "file": "${packages}/GoGuru/Default (Linux).sublime-keymap",
+        "platform": "Linux"
+        }
+    },
+    {
+        "caption": "GoGuru: Default Key Bindings",
+        "command": "open_file",
+        "args": {
+            "file": "${packages}/GoGuru/Default (Windows).sublime-keymap",
+        "platform": "Windows"
+        }
+    },
+    {
+        "caption": "GoGuru: Default Key Bindings",
+        "command": "open_file",
+        "args": {
+            "file": "${packages}/GoGuru/Default (OSX).sublime-keymap",
+        "platform": "OSX"
+        }
+    },
+]
